@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=1">
+
+    <meta name="description" content="Complex exponential representation">
+    <meta name=" keywords" content="Complex, exponential">
+
+    <title>ComplExp</title>
+
+    <!--link rel="icon" type="image/svg" href="imgs/icons/person_raised_hand.svg"-->
+    <link rel="stylesheet" href="css/clear-days.css">
+    <link rel="stylesheet" href="css/fonts/noto.css">
+    <link rel="stylesheet" href="css/icons/material-icons.css">
+
+    <!-- MathJax -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            loader: { load: ['[tex]/mathtools', '[tex]/newcommand'] },
+            tex: {
+                packages: { '[+]': ['mathtools', 'newcommand'] },
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                tags: 'ams',
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="page-container" class="page-container hidden transparent sans-serif-font">
+        <div id="plot-and-sliders-container">
+            <div id="complexp-plot-container" class="plot-container">
+                <!-- Plot -->
+                <div id="complexp-plot" class="plot" style="width: 500px; height: 500px;">
+                    <!-- Axis canvas -->
+                    <canvas id="complexp-canvas" name="plot" class="plot main">
+                    </canvas>
+                    <!-- Geometric aid canvas -->
+                    <canvas id="geometric-aid-complexp-canvas" name="plot" class="plot stacked">
+                    </canvas>
+                    <!-- Vectors canvas -->
+                    <canvas id="vectors-complexp-canvas" name="plot" class="plot stacked">
+                    </canvas>
+                    <!-- Points canvas -->
+                    <canvas id="points-complexp-canvas" name="plot" class="plot stacked">
+                    </canvas>
+                    <!-- Zoom out button -->
+                    <button id="complexp-plot-zoom-out" class="plot-control round-button zoom-in">
+                        <span class="material-symbols-rounded bold-button">
+                            remove
+                        </span>
+                    </button>
+                    <!-- Zoom in button -->
+                    <button id="complexp-plot-zoom-in" class="plot-control round-button zoom-out">
+                        <span class="material-symbols-rounded bold-button">
+                            add
+                        </span>
+                    </button>
+                    <!-- Plot refresh button -->
+                    <button id="complexp-plot-refresh" class="plot-control round-button plot-refresh">
+                        <span class="material-symbols-rounded">
+                            refresh
+                        </span>
+                    </button>
+                    <!-- Toggle grid button -->
+                    <button id="complexp-plot-toggle-grid" class="plot-control round-button toggle-grid">
+                        <span class="material-symbols-rounded grid-icon">
+                            grid_4x4
+                        </span>
+                    </button>
+                    <!-- Toggle geometric aid -->
+                    <button id="complexp-plot-toggle-geometric-aid" class="plot-control round-button toggle-geometric-aid transparent">
+                        <span class="material-symbols-rounded grid-icon">
+                            architecture
+                        </span>
+                    </button>
+                    <!-- Toggle full screen button -->
+                    <button id="complexp-plot-toggle-fullscreen" class="plot-control round-button fullscreen">
+                        <span id="complexp-plot-toggle-fullscreen-icon" class="material-symbols-rounded">
+                            fullscreen
+                        </span>
+                    </button>
+                    <!-- Plot loader -->
+                    <div id="complexp-loader" name="plot-loader" class="plot loader"></div>
+                </div>
+            </div>
+    
+            <div id="complexp-plot-sliders-container" class="sliders-container centered">
+                <!-- Sliders panel, it puts the slider in column -->
+                <div id="complexp-plot-sliders-panel" class="vertical-options-panel-group plot-sliders-panel midsize">
+                    <!-- Sliders panel group for param "x" -->
+                    <div id="complexp-param-x-group" class="plot-slider-group">
+                        <!-- Group comprised of play/pause button and param value -->
+                        <div class="plot-slider-controls-group">
+                            <!-- Play/pause button -->
+                            <button id="complexp-param-x-play-button" class="round-button glass-grey slider-control ">
+                                <span id="complexp-param-x-play-icon" class="material-symbols-rounded">
+                                    play_arrow
+                                </span>
+                            </button>
+                            <!-- Param value -->
+                            <div class="plot-slider-value-container">
+                                <span id="complexp-param-x-value" class="plot-slider-value">$x = 0$</span>
+                            </div>
+                        </div>
+                        <!-- Actual slider -->
+                        <input id="complexp-param-x" class="plot-slider" type="range" min="-12.56" max="12.56" value="0"
+                            step="0.01">
+                    </div>
+                    <!-- Sliders panel group for param "r" -->
+                    <div id="complexp-param-r-group" class="plot-slider-group">
+                        <!-- Group comprised of play/pause button and param value -->
+                        <div class="plot-slider-controls-group">
+                            <!-- Play/pause button -->
+                            <button id="complexp-param-r-play-button" class="round-button glass-grey slider-control ">
+                                <span id="complexp-param-r-play-icon" class="material-symbols-rounded">
+                                    play_arrow
+                                </span>
+                            </button>
+                            <!-- Param value -->
+                            <div class="plot-slider-value-container">
+                                <span id="complexp-param-r-value" class="plot-slider-value">$r = 1$</span>
+                            </div>
+                        </div>
+                        <!-- Actual slider -->
+                        <input id="complexp-param-r" class="plot-slider" type="range" min="0" max="10" value="1" step="0.1">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fullscreen-container" class="fullscreen-container"></div>
+    <div id="fullscreen-sliders-container" class="fullscreen-container"></div>
+
+    <!-- Spinning loader -->
+
+    <div id="loading-container" class="loading-container">
+        <div class="general loader"></div>
+    </div>
+
+    <!-- JS files -->
+
+    <script src="js/src/util/utils.js"></script>
+    <script src="js/src/page-controller.js"></script>
+    <script src="js/src/util/coordinate-system.js"></script>
+    <script src="js/src/plots/plot-structure.js"></script>
+    <script src="js/src/plots/complexp-plot.js"></script>
+    <script src="js/src/plots/plots-manager.js"></script>
+</body>
