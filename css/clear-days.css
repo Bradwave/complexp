@@ -237,11 +237,6 @@ body.hidden-overflow {
     transition: opacity 0.1s ease-in-out, grid-template-columns 0.5s ease-in-out;
 }
 
-/* Removes the column layout when portrait mode is active */
-.page-container.portrait-mode {
-    grid-template-columns: none;
-}
-
 /* The page container is hidden */
 .page-container.hidden {
     visibility: hidden;
@@ -279,6 +274,27 @@ div.plot-container {
     border: none;
     outline: none;
     background-color: transparent;
+}
+
+#plot-and-sliders-container {
+    width: 500px;
+    height: 100%;
+}
+
+/* On screens that are horizontally 500px or less */
+@media screen and (max-width: 500px) {
+    #plot-and-sliders-container {
+        margin-left: 2.5%;
+        width: 95%;
+
+    }
+
+    /* On screens that are vertically 500px or less */
+    @media screen and (max-height: 500px) {
+        #plot-and-sliders-container {
+            height: 50%;
+        }
+    }
 }
 
 /* Div container for fullscreen content: hen a plot goes to fullscreen mode, it goes here */
@@ -362,6 +378,10 @@ canvas.plot.stacked {
 /* Squares the border of the plot canvas */
 canvas.plot.squared-border {
     border-radius: 0;
+}
+
+#geometric-aid-complexp-canvas, #vectors-complexp-canvas, #points-complexp-canvas {
+    pointer-events: none;
 }
 
 /* -- 2.2.4 Plot controls -- */

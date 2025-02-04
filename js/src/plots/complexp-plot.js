@@ -325,7 +325,7 @@ let complexpPlot = function (id, options) {
 
         if (options.isTranslationActive) {
             // Executes when a mouse button si pressed the canvas
-            axisPlot.getCanvas().onmousedown = (e) => {
+            document.getElementById(id + "-plot").onmousedown = (e) => {
                 // If the left button is clicked
                 if (e.button == 0) {
                     isLeftMouseDown = true;
@@ -335,14 +335,14 @@ let complexpPlot = function (id, options) {
             }
 
             // Executes when a mouse button is released on the whole document
-            document.onmouseup = (e) => {
+            document.getElementById(id + "-plot").onmouseup = (e) => {
                 if (e.button == 0) {
                     isLeftMouseDown = false;
                 }
             }
 
             // Executes when the mouse is moved on the whole document
-            document.onmousemove = (e) => {
+            document.getElementById(id + "-plot").onmousemove = (e) => {
                 // If the left mouse is pressed
                 if (isLeftMouseDown) {
                     // Stops running animations
@@ -355,27 +355,27 @@ let complexpPlot = function (id, options) {
             }
 
             // Executes when the touch starts on the canvas
-            axisPlot.getCanvas().ontouchstart = (e) => {
+            document.getElementById(id + "-plot").ontouchstart = (e) => {
                 // Stores the current touch position
                 touchPosition = getTouchPosition(e);
             }
 
 
             // Executes when a touch move event is detected
-            document.ontouchmove = (e) => {
+            document.getElementById(id + "-plot").ontouchmove = (e) => {
                 // Stores the current touch position
                 const newTouchPosition = getTouchPosition(e);
                 // Translates the axis
                 translateAxis(newTouchPosition);
             }
 
-            /**
+            /**c
              * Store the latest touch position.
              * @param {*} e Event
              * @returns The current touch position.
              */
             const getTouchPosition = (e) => {
-                e.preventDefault();
+                // e.preventDefault();
                 // Stores the touches
                 let touches = e.changedTouches;
                 return {
