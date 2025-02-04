@@ -335,14 +335,14 @@ let complexpPlot = function (id, options) {
             }
 
             // Executes when a mouse button is released on the whole document
-            document.getElementById(id + "-plot").onmouseup = (e) => {
+            document.onmouseup = (e) => {
                 if (e.button == 0) {
                     isLeftMouseDown = false;
                 }
             }
 
             // Executes when the mouse is moved on the whole document
-            document.getElementById(id + "-plot").onmousemove = (e) => {
+            document.onmousemove = (e) => {
                 // If the left mouse is pressed
                 if (isLeftMouseDown) {
                     // Stops running animations
@@ -355,18 +355,22 @@ let complexpPlot = function (id, options) {
             }
 
             // Executes when the touch starts on the canvas
-            document.getElementById(id + "-plot").ontouchstart = (e) => {
+            axisPlot.getCanvas().ontouchstart = (e) => {
+                isLeftMouseDown = true;
                 // Stores the current touch position
                 touchPosition = getTouchPosition(e);
             }
 
 
             // Executes when a touch move event is detected
-            document.getElementById(id + "-plot").ontouchmove = (e) => {
-                // Stores the current touch position
-                const newTouchPosition = getTouchPosition(e);
-                // Translates the axis
-                translateAxis(newTouchPosition);
+            document.ontouchmove = (e) => {
+                // If touch started on the canvas
+                if (isLeftMouseDown) {
+                    // Stores the current touch position
+                    const newTouchPosition = getTouchPosition(e);
+                    // Translates the axis
+                    translateAxis(newTouchPosition);
+                }
             }
 
             /**c
@@ -873,7 +877,7 @@ let complexpPlot = function (id, options) {
             gCtx.strokeStyle = options.geometricAidColor;
 
             /* -- Circle -- */
-            
+
             // Sets the line width for the circle and the line
             gCtx.lineWidth = options.geometricAidWidth - 1;
             // Sets the dash pattern for the circle and the line

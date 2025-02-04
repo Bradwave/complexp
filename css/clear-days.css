@@ -276,27 +276,6 @@ div.plot-container {
     background-color: transparent;
 }
 
-#plot-and-sliders-container {
-    width: 500px;
-    height: 100%;
-}
-
-/* On screens that are horizontally 500px or less */
-@media screen and (max-width: 500px) {
-    #plot-and-sliders-container {
-        margin-left: 2.5%;
-        width: 95%;
-
-    }
-
-    /* On screens that are vertically 500px or less */
-    @media screen and (max-height: 500px) {
-        #plot-and-sliders-container {
-            height: 50%;
-        }
-    }
-}
-
 /* Div container for fullscreen content: hen a plot goes to fullscreen mode, it goes here */
 div.fullscreen-container {
     position: absolute;
@@ -333,6 +312,32 @@ div.plot {
     transition: all var(--general-transition-duration) ease-in-out;
 }
 
+#complexp-plot {
+    width: 500px;
+    height: 500px;
+}
+
+/* On screens that are 500px or less, resizes the plot */
+@media screen and (max-width: 500px) {
+    #complexp-plot {
+        width: 400px;
+    }
+}
+
+/* On screens that are 500px or less, resizes the plot */
+@media screen and (max-width: 400px) {
+    #complexp-plot {
+        width: 300px;
+    }
+}
+
+/* On screens that are 500px or less, resizes the plot */
+@media screen and (max-width: 300px) {
+    #complexp-plot {
+        width: 200px;
+    }
+}
+
 /* Class added to the plot when in fullscreen mode. */
 div.plot.fullscreen {
     position: fixed;
@@ -343,7 +348,7 @@ div.plot.fullscreen {
     margin: 0;
     padding: 0;
     border-radius: 0;
-    z-index: 999;
+    z-index: 90;
 }
 
 /* -- 2.2.3 Canvas -- */
@@ -378,10 +383,6 @@ canvas.plot.stacked {
 /* Squares the border of the plot canvas */
 canvas.plot.squared-border {
     border-radius: 0;
-}
-
-#geometric-aid-complexp-canvas, #vectors-complexp-canvas, #points-complexp-canvas {
-    pointer-events: none;
 }
 
 /* -- 2.2.4 Plot controls -- */
