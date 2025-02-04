@@ -321,51 +321,52 @@ let complexpPlot = function (id, options) {
 
     function addEventListeners() {
 
+        const eventsCache = [];
+        let previousDiff = -1;
+        let isZooming = false;
+
         /* -- Axis translation -- */
 
         if (options.isTranslationActive) {
             // Executes when a mouse button si pressed the canvas
-            document.getElementById(id + "-plot").onmousedown = (e) => {
-                // If the left button is clicked
-                if (e.button == 0) {
+            document.getElementById(id + "-plot").onpointerdown = (e) => {
+                // The mouse or touch position is stored
+                touchPosition = { x: e.clientX * dpi, y: e.clientY * dpi };
+                //Not mouse pointer or mouse pointer with left button
+                if (e.pointerType == 'mouse' && e.button === 0) {
                     isLeftMouseDown = true;
-                    // The mouse position is stored
-                    touchPosition = { x: e.clientX * dpi, y: e.clientY * dpi };
+                }
+                if (e.pointerType == 'touch') {
+                    eventsCache.push(e);
                 }
             }
 
             // Executes when a mouse button is released on the whole document
-            document.onmouseup = (e) => {
-                if (e.button == 0) {
+            document.onpointerup = (e) => {
+                //Not mouse pointer or mouse pointer with left button
+                if (e.pointerType == 'mouse' && e.button === 0) {
                     isLeftMouseDown = false;
+                } else if (e.pointerType == 'touch') {
+                    // Remove this pointer from the cache and reset the target's
+                    const index = eventsCache.findIndex(
+                        (cachedEvent) => cachedEvent.pointerId === e.pointerId,
+                    );
+                    eventsCache.splice(index, 1);
+
+                    // If the number of pointers down is less than two then reset diff tracker
+                    if (eventsCache.length < 2) {
+                        prevDiff = -1;
+
+                        setTimeout(() => {
+                            isZooming = false;
+                        }, 500);
+                    }
                 }
             }
 
             // Executes when the mouse is moved on the whole document
-            document.onmousemove = (e) => {
-                // If the left mouse is pressed
-                if (isLeftMouseDown) {
-                    // Stops running animations
-                    isRunning = false;
-                    // Stores the current mouse position
-                    const newTouchPosition = { x: e.clientX * dpi, y: e.clientY * dpi }
-                    // Translates the axis
-                    translateAxis(newTouchPosition);
-                }
-            }
-
-            // Executes when the touch starts on the canvas
-            axisPlot.getCanvas().ontouchstart = (e) => {
-                isLeftMouseDown = true;
-                // Stores the current touch position
-                touchPosition = getTouchPosition(e);
-            }
-
-
-            // Executes when a touch move event is detected
-            document.ontouchmove = (e) => {
-                // If touch started on the canvas
-                if (isLeftMouseDown) {
+            document.getElementById(id + "-plot").ontouchmove = (e) => {
+                if (!isZooming) {
                     // Stores the current touch position
                     const newTouchPosition = getTouchPosition(e);
                     // Translates the axis
@@ -373,7 +374,20 @@ let complexpPlot = function (id, options) {
                 }
             }
 
-            /**c
+            document.onpointermove = (e) => {
+                if (isLeftMouseDown && e.pointerType == 'mouse') {
+                    // Stores the current mouse position
+                    const newTouchPosition = { x: e.clientX * dpi, y: e.clientY * dpi }
+                    // Translates the axis
+                    translateAxis(newTouchPosition);
+                }
+            }
+
+            document.onpointercancel = () => {
+                isLeftMouseDown = false;
+            }
+
+            /**
              * Store the latest touch position.
              * @param {*} e Event
              * @returns The current touch position.
@@ -459,6 +473,50 @@ let complexpPlot = function (id, options) {
                 publicAPIs.drawPlot();
                 // "passive: false" allows preventDefault() to be called
             }, { passive: false });
+
+            document.getElementById(id + "-plot").onpointermove = (e) => {
+                if (e.pointerType == 'touch') {
+
+
+                    const index = eventsCache.findIndex(
+                        (cachedEvent) => cachedEvent.pointerId === e.pointerId,
+                    );
+                    eventsCache[index] = e;
+
+                    // If two pointers are down, check for pinch gestures
+                    if (eventsCache.length === 2) {
+                        isZooming = true;
+                        // Calculate the distance between the two pointers
+                        const currentDiff = Math.sqrt(
+                            (eventsCache[0].clientX * dpi - eventsCache[1].clientX * dpi) ** 2 +
+                            (eventsCache[0].clientY * dpi - eventsCache[1].clientY * dpi) ** 2);
+
+                        // Bounding client rectangle
+                        const rect = e.target.getBoundingClientRect();
+                        // x position of the zoom center
+                        const zoomX = (.5 * (eventsCache[0].clientX + eventsCache[1].clientX) - rect.left) * dpi;
+                        // y position of the zoom center
+                        const zoomY = (.5 * (eventsCache[0].clientY + eventsCache[1].clientY) - rect.top) * dpi;
+
+                        if (previousDiff > 0) {
+                            // The distance between the two pointers has increased
+                            if (currentDiff > previousDiff) {
+                                // Updates the zoom level
+                                cs.updateZoom(1.03, { x: zoomX, y: zoomY });
+                            }
+                            // The distance between the two pointers has decreased
+                            if (currentDiff < previousDiff) {
+                                cs.updateZoom(0.97, { x: zoomX, y: zoomY });
+                            }
+                            // Draws the plot
+                            publicAPIs.drawPlot();
+                        }
+
+                        // Cache the distance for the next move event
+                        previousDiff = currentDiff;
+                    }
+                }
+            }
         }
 
         if (options.isGridToggleActive) {

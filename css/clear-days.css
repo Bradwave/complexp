@@ -203,7 +203,6 @@ body {
     background-color: var(--background);
     color: var(--secondary);
     opacity: 1;
-    counter-reset: chapter section subsection definition definition theorem;
     scroll-behavior: smooth;
     scrollbar-width: thin;
     -webkit-transition: all var(--general-transition-duration) ease-in-out;
@@ -305,6 +304,7 @@ div.plot {
     background-color: transparent;
     color: transparent;
     overscroll-behavior: contain;
+    touch-action: none;
     -webkit-transition: all var(--general-transition-duration) ease-in-out;
     -moz-transition: all var(--general-transition-duration) ease-in-out;
     -ms-transition: all var(--general-transition-duration) ease-in-out;
@@ -338,13 +338,24 @@ div.plot {
     }
 }
 
+/* On screens that are 500px hight or less, resizes the plot */
+@media screen and (max-height: 500px) {
+    #complexp-plot {
+        height: 100vh;
+    }
+}
+
 /* Class added to the plot when in fullscreen mode. */
 div.plot.fullscreen {
     position: fixed;
     top: 0;
     left: 0;
+    width: 100vw;
     min-width: 100vw;
-    min-height: 100vh;
+    max-width: 100vw;
+    width: 90vh;
+    min-height: 90vh;
+    max-height: 90vh;
     margin: 0;
     padding: 0;
     border-radius: 0;
