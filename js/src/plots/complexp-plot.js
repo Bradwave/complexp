@@ -151,7 +151,7 @@ let complexpPlot = function (id, options) {
     let isFullscreen = false;
 
     /*_______________________________________
-    |   Math
+    |   Parameters
     */
 
     /**
@@ -255,7 +255,7 @@ let complexpPlot = function (id, options) {
         });
 
         // If points are present...
-        if (options.parameters.length > 0) {
+        if (options.points.length > 0) {
             // Creates the plot structure
             pPlot = new plotStructure("points" + "-" + id, { alpha: true });
             // And stores the context
@@ -341,12 +341,13 @@ let complexpPlot = function (id, options) {
                 }
             }
 
-            // Executes when a mouse button is released on the whole document
+            // Executes when a mouse button or a touch is released on the whole document
             document.onpointerup = (e) => {
-                //Not mouse pointer or mouse pointer with left button
+                // Not mouse pointer or mouse pointer with left button
                 if (e.pointerType == 'mouse' && e.button === 0) {
                     isLeftMouseDown = false;
                 } else if (e.pointerType == 'touch') {
+                    // If it's a touch pointer
                     // Remove this pointer from the cache and reset the target's
                     const index = eventsCache.findIndex(
                         (cachedEvent) => cachedEvent.pointerId === e.pointerId,
@@ -354,12 +355,12 @@ let complexpPlot = function (id, options) {
                     eventsCache.splice(index, 1);
 
                     // If the number of pointers down is less than two then reset diff tracker
-                    if (eventsCache.length < 2) {
+                    if (isZooming && eventsCache.length < 2) {
                         prevDiff = -1;
-
-                        setTimeout(() => {
-                            isZooming = false;
-                        }, 500);
+                        // Not zooming anymore
+                        isZooming = false;
+                        // Stores the remaining touch position
+                        touchPosition = { x: eventsCache[0].clientX * dpi, y: eventsCache[0].clientY * dpi };
                     }
                 }
             }
@@ -374,6 +375,7 @@ let complexpPlot = function (id, options) {
                 }
             }
 
+            // Executes when the pointer moves
             document.onpointermove = (e) => {
                 if (isLeftMouseDown && e.pointerType == 'mouse') {
                     // Stores the current mouse position
@@ -383,6 +385,7 @@ let complexpPlot = function (id, options) {
                 }
             }
 
+            // Executes when the pointer event is cancelled
             document.onpointercancel = () => {
                 isLeftMouseDown = false;
             }
@@ -474,10 +477,10 @@ let complexpPlot = function (id, options) {
                 // "passive: false" allows preventDefault() to be called
             }, { passive: false });
 
+            // Executes when a touch pointer moves
             document.getElementById(id + "-plot").onpointermove = (e) => {
                 if (e.pointerType == 'touch') {
-
-
+                    // Caches the event
                     const index = eventsCache.findIndex(
                         (cachedEvent) => cachedEvent.pointerId === e.pointerId,
                     );
@@ -1425,10 +1428,10 @@ let complexpPlot = function (id, options) {
      * Checks if a point is inside the canvas.
      * @param {Number} pX Coordinate x of the point.
      * @param {Number} pY Coordinate y of the point.
-     * @param {Number} tolerance Tolerance.
+     * @param {Number} tolerance Tolerance (zero by default).
      * @returns True if the point is inside the canvas, false otherwise.
      */
-    const isInbound = (pX, pY, tolerance) => {
+    const isInbound = (pX, pY, tolerance = 0) => {
         const isXInbound = (pX < cs.screenXMax + tolerance) && (pX > cs.screenXMin - tolerance);
         const isYInbound = (pY < cs.screenYMax + tolerance) && (pY > cs.screenYMin - tolerance)
         return isXInbound && isYInbound;
